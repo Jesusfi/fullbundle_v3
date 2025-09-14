@@ -1,0 +1,9 @@
+{
+  "name": "Millionaire Tracker (Bundle v3)",
+  "short_name": "Millionaire",
+  "display": "standalone",
+  "start_url": "/app/index.html",
+  "background_color": "#0b1020",
+  "theme_color": "#0f172a",
+  "icons": []
+}

@@ -1,0 +1,27 @@
+
+:root { --bg:#0b1020; --card:#111832; --fg:#e5e7eb; --muted:#9ca3af; --accent:#60a5fa; --primary:#2563eb; --danger:#ef4444; }
+* { box-sizing: border-box; }
+html, body { margin:0; padding:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Helvetica Neue', Arial; background:var(--bg); color:var(--fg); }
+header { padding: 24px 16px; max-width: 1024px; margin: 0 auto; }
+h1 { margin: 0 0 8px; display:flex; gap:12px; align-items: baseline;}
+.tag { background:#1f2a4d; border:1px solid #2c3a6a; padding:2px 8px; border-radius: 9999px; font-size: 12px; color:#a5b4fc; }
+.subtitle { color: var(--muted); margin: 0; }
+main { max-width: 1024px; margin: 0 auto; padding: 0 16px 80px; display: grid; gap: 16px; }
+.card { background: var(--card); border: 1px solid #1f2945; border-radius: 12px; padding: 16px; }
+h2 { margin-top: 0; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+label { display: grid; gap: 6px; font-size: 14px; color: var(--muted); }
+input, select { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #2a365e; background: #0c142b; color: var(--fg); }
+.actions { display:flex; gap:8px; margin-top: 8px; flex-wrap: wrap; }
+button { padding: 10px 14px; border-radius: 8px; border: 1px solid #33406b; background:#14224a; color: var(--fg); cursor: pointer; }
+button.primary { background: var(--primary); border-color: #1d4ed8; }
+button.danger { background: var(--danger); border-color: #b91c1c; }
+.list { display: grid; gap: 8px; margin-top: 12px; }
+.row { display:grid; grid-template-columns: 1fr auto; align-items: center; gap: 12px; background: #0c142b; padding: 10px 12px; border-radius: 8px; border: 1px solid #253058; }
+.row .meta { display: grid; gap: 4px; }
+.row h3 { margin:0; font-size: 15px; }
+.row .muted { color: var(--muted); font-size: 13px; }
+.flex-row { display:flex; gap:12px; align-items:center; }
+.spacer { flex:1; }
+footer { max-width: 1024px; margin: 16px auto; padding: 0 16px 32px; color: var(--muted); }
+details summary { cursor: pointer; }

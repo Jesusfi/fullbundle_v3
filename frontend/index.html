@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0f172a">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <title>Millionaire Tracker (Bundle v3)</title>
+  <link rel="stylesheet" href="./style.css">
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', async () => {
+        try { await navigator.serviceWorker.register('./sw.js'); } catch (e) { console.warn('SW fail', e); }
+      });
+    }
+  </script>
+</head>
+<body>
+  <header>
+    <h1>Millionaire Tracker <small class="tag">bundle v3</small></h1>
+    <p class="subtitle">Backend-powered PWA (served by FastAPI). Data saved in SQLite per username.</p>
+  </header>
+
+  <main>
+    <section class="card" id="loginCard">
+      <h2>Login</h2>
+      <div class="grid">
+        <label>Username
+          <input id="username" placeholder="e.g., jesus">
+        </label>
+      </div>
+      <div class="actions">
+        <button id="loginBtn" class="primary">Login</button>
+      </div>
+    </section>
+
+    <section class="card" id="appCard" style="display:none;">
+      <div class="flex-row">
+        <h2>Your Assumptions</h2>
+        <div class="spacer"></div>
+        <button id="logoutBtn">Logout</button>
+      </div>
+      <div class="grid">
+        <label>Target net worth (USD)
+          <input id="target" type="number" min="0" step="1000" value="1000000">
+        </label>
+        <label>Default CAGR (%/yr)
+          <input id="defaultCAGR" type="number" step="0.1" value="7.0">
+        </label>
+        <label>Simulation step
+          <input value="Monthly (12)" disabled>
+        </label>
+        <label>Monthly total contributions (USD)
+          <input id="monthlyContrib" type="number" min="0" step="10" value="0">
+        </label>
+        <label>Cash APY (%/yr)
+          <input id="cashAPY" type="number" step="0.1" value="4.5">
+        </label>
+        <label>Price provider
+          <select id="priceProvider">
+            <option value="none">None</option>
+            <option value="yahoo">Yahoo</option>
+            <option value="stooq">Stooq</option>
+            <option value="alphavantage">Alpha Vantage</option>
+          </select>
+        </label>
+        <label>Alpha Vantage API key
+          <input id="alphaKey" placeholder="demo or your key">
+        </label>
+      </div>
+      <div class="actions">
+        <button id="saveAssumptions" class="primary">Save assumptions</button>
+      </div>
+    </section>
+
+    <section class="card" id="holdingsCard" style="display:none;">
+      <h2>Accounts & Holdings</h2>
+      <details open>
+        <summary>Add / edit holding</summary>
+        <form id="holdingForm">
+          <input type="hidden" id="editId">
+          <div class="grid">
+            <label>Type
+              <select id="hType" required>
+                <option value="ticker">Ticker</option>
+                <option value="cagr">CAGR-Only</option>
+                <option value="cash">Cash</option>
+              </select>
+            </label>
+            <label>Name / Ticker
+              <input id="hName" required>
+            </label>
+            <label>Units (or value for cash/CAGR)
+              <input id="hUnits" type="number" step="0.0001" value="0">
+            </label>
+            <label>Price (for tickers)
+              <input id="hPrice" type="number" step="0.0001" value="0">
+            </label>
+            <label>CAGR %/yr
+              <input id="hCAGR" type="number" step="0.1" value="7">
+            </label>
+            <label>Monthly contribution (USD)
+              <input id="hContrib" type="number" step="1" value="0">
+            </label>
+          </div>
+          <div class="actions">
+            <button type="submit" class="primary" id="saveBtn">Save holding</button>
+            <button type="button" id="resetForm">Reset</button>
+          </div>
+        </form>
+      </details>
+
+      <div class="actions">
+        <button id="refreshPrices">Refresh prices</button>
+      </div>
+
+      <div id="holdingsList" class="list"></div>
+    </section>
+
+    <section class="card" id="resultsCard" style="display:none;">
+      <h2>Results</h2>
+      <div id="results"><p>Click <em>Run projection</em>.</p></div>
+      <div class="actions">
+        <button id="run" class="primary">Run projection</button>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <small>Bundle v3 — served by FastAPI at /app.</small>
+  </footer>
+
+  <script src="./app.js"></script>
+</body>
+</html>
