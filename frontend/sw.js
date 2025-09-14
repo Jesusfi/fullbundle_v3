@@ -1,6 +1,5 @@
 // sw.js
-const CACHE = 'bundle-v3-65y-table-1';   // <— change this string each time
-
+const CACHE = 'bundle-v3-countdown-3'; // change string
 self.addEventListener('install', (e) => {
   e.waitUntil((async () => {
     const cache = await caches.open(CACHE);

@@ -6,7 +6,92 @@ const API = (path, opts={}) => {
   if (token) opts.headers['Authorization'] = 'Bearer ' + token;
   return fetch(path, opts);
 };
+// --- Countdown helpers ---
+let countdownHandle = null;
 
+function addMonthsLocal(date, months) {
+  // Preserve the time-of-day so we get a ticking hh:mm:ss remainder
+  const d = new Date(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate(),
+    date.getHours(),
+    date.getMinutes(),
+    date.getSeconds(),
+    date.getMilliseconds()
+  );
+  const day = d.getDate();
+  d.setDate(1);
+  d.setMonth(d.getMonth() + months);
+  const lastDay = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+  d.setDate(Math.min(day, lastDay));
+  return d;
+}
+
+function diffYMDHMS(from, to) {
+  // years+months by calendar; then leftover days/h/m/s by ms
+  let monthsTotal = (to.getFullYear() - from.getFullYear()) * 12 +
+                    (to.getMonth() - from.getMonth());
+  if (to.getDate() < from.getDate()) monthsTotal -= 1;
+
+  const years  = Math.floor(monthsTotal / 12);
+  const months = monthsTotal % 12;
+
+  const anchor = addMonthsLocal(from, monthsTotal);
+  let ms = Math.max(0, to - anchor);
+  const dayMs = 24 * 60 * 60 * 1000, hourMs = 60 * 60 * 1000, minMs = 60 * 1000;
+
+  const days    = Math.floor(ms / dayMs);   ms -= days * dayMs;
+  const hours   = Math.floor(ms / hourMs);  ms -= hours * hourMs;
+  const minutes = Math.floor(ms / minMs);   ms -= minutes * minMs;
+  const seconds = Math.floor(ms / 1000);
+
+  return { years, months, days, hours, minutes, seconds };
+}
+
+function startCountdown(targetISO) {
+  const el = document.getElementById('countdown');
+  if (countdownHandle) { clearTimeout(countdownHandle); countdownHandle = null; }
+  if (!targetISO || !el) return;
+
+  // Treat API ISO as local wall time
+  const target = new Date(targetISO);
+
+  function two(n){ return String(n).padStart(2, '0'); }
+
+  function tick() {
+    // Element may be re-rendered; stop if it's gone
+    if (!document.body.contains(el)) return;
+
+    const now = new Date();
+    if (now >= target) {
+      el.textContent = 'Goal reached! 🎉';
+      return;
+    }
+
+    const { years, months, days, hours, minutes, seconds } = diffYMDHMS(now, target);
+    el.innerHTML = `
+      <span class="unit"><span class="time">${years}</span>y</span>
+      <span class="unit"><span class="time">${months}</span>m</span>
+      <span class="unit"><span class="time">${days}</span>d</span>
+      <span class="unit"><span class="time">${two(hours)}</span>:</span>
+      <span class="unit"><span class="time">${two(minutes)}</span>:</span>
+      <span class="unit"><span class="time">${two(seconds)}</span></span>
+    `;
+
+    // Schedule next tick exactly on the next second boundary
+    const delay = 1000 - (Date.now() % 1000);
+    countdownHandle = setTimeout(tick, delay);
+  }
+
+  tick(); // kick off
+}
+
+function isoToLocalDateString(iso) {
+  const [y, m, d] = iso.split('-').map(Number);
+  const dt = new Date(y, m - 1, d);   // local midnight
+  return dt.toLocaleDateString();
+}
 function toast(msg) {
   const div = document.createElement('div');
   div.textContent = msg;
@@ -169,10 +254,12 @@ function renderResults(out) {
   let html = `
     <p><strong>Run at:</strong> ${runAt}</p>
     <p><strong>Start total:</strong> $${out.start_total.toFixed(2)}</p>
-    ${out.millionaire_date
-      ? `<p><strong>Projected millionaire date:</strong> ${new Date(out.millionaire_date).toLocaleDateString()} (<em>${out.days_to_target} days</em>)</p>`
-      : `<p><strong>Projected millionaire date:</strong> Not reached.</p>`
-    }
+    <p><strong>Projected millionaire date:</strong> ${
+      out.millionaire_date
+        ? `${new Date(out.millionaire_date).toLocaleDateString()} (<em>${out.days_to_target} days</em>)`
+        : 'Not reached.'
+    }</p>
+    ${out.millionaire_date ? '<div id="countdown" class="countdown"></div>' : ''}
     <hr>
     <h3>Monthly Projection (65 years)</h3>
     <div style="max-height: 420px; overflow:auto; border:1px solid #253058; border-radius:8px;">
@@ -185,11 +272,11 @@ function renderResults(out) {
         </thead>
         <tbody>
           ${rows.map(([iso, total]) => {
-            const d = new Date(iso + 'T00:00:00Z');
             return `<tr>
-              <td style="padding:6px 8px;">${d.toLocaleDateString()}</td>
+              <td style="padding:6px 8px;">${isoToLocalDateString(iso)}</td>
               <td style="padding:6px 8px; text-align:right;">$${Number(total).toFixed(2)}</td>
             </tr>`;
+
           }).join('')}
         </tbody>
       </table>
@@ -197,6 +284,8 @@ function renderResults(out) {
   `;
 
   res.innerHTML = html;
+  // start/update the countdown
+  if (out.millionaire_date) startCountdown(out.millionaire_date);
 }
 
 

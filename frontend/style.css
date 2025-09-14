@@ -25,3 +25,19 @@ button.danger { background: var(--danger); border-color: #b91c1c; }
 .spacer { flex:1; }
 footer { max-width: 1024px; margin: 16px auto; padding: 0 16px 32px; color: var(--muted); }
 details summary { cursor: pointer; }
+.countdown {
+  margin: 6px 0 12px;
+  padding: 12px 14px;
+  display: inline-block;
+  background: #0c142b;
+  border: 1px solid #253058;
+  border-radius: 10px;
+  font-size: 28px;
+  line-height: 1.2;
+  font-weight: 800;
+  letter-spacing: .5px;
+  font-variant-numeric: tabular-nums;
+}
+.countdown .unit { margin-right: 8px; }
+.countdown .time { display: inline-block; min-width: 2ch; text-align: right; }
+
